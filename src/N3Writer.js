@@ -129,6 +129,11 @@ export default class N3Writer {
 
   // ### `_encodeIriOrBlank` represents an IRI or blank node
   _encodeIriOrBlank(entity) {
+    // print variables as-is
+    if (entity.termType === 'Variable') {
+      return entity.id.substr(1);
+    }
+
     // A blank node or list is represented as-is
     if (entity.termType !== 'NamedNode') {
       // If it is a list head, pretty-print it
