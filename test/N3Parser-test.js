@@ -897,13 +897,21 @@ describe('Parser', function () {
   describe('An Parser instance without document IRI', function () {
     function parser() { return new Parser(); }
 
-    it('should not resolve the IRIs',
+    it('should keep relative IRIs',
       shouldParse(parser,
         '@prefix : <#>.\n' +
         '<a> <b> <c> <g>.\n' +
         ':d :e :f :g.',
         [fromId('a'), fromId('b'), fromId('c'), fromId('g')],
         [fromId('#d'), fromId('#e'), fromId('#f'), fromId('#g')]));
+
+    it('should keep empty IRIs',
+      shouldParse(parser,
+        '@prefix : <>.\n' +
+        '<> <> <> <>.\n' +
+        ': : : :.',
+        [new NamedNode(''), new NamedNode(''), new NamedNode(''), new NamedNode('')],
+        [new NamedNode(''), new NamedNode(''), new NamedNode(''), new NamedNode('')]));
   });
 
   describe('An Parser instance with a document IRI', function () {
@@ -1109,6 +1117,10 @@ describe('Parser', function () {
 
     it('should not parse a prefix declaration',
       shouldNotParse(parser, '@prefix : <p#>.', 'Unexpected "@prefix" on line 1.'));
+
+    it('should not parse apostrophe literals',
+      shouldNotParse(parser, "_:a <http://ex.org/b> 'c'.",
+                             "Unexpected \"'c'.\" on line 1."));
 
     it('should not parse triple-quoted literals',
       shouldNotParse(parser, '_:a <http://ex.org/b> """c""".',
